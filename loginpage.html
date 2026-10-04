@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Academic Tracking System</title>
+
+<style>
+*{box-sizing:border-box;font-family:Arial;margin:0;padding:0}
+body{background:#f3f6fb;color:#172033}
+button{cursor:pointer}
+
+.login{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#172554,#2563eb);
+}
+.login-box{
+    width:380px;background:white;padding:35px;border-radius:18px;
+    box-shadow:0 15px 40px #0004;
+}
+.login-box h1{text-align:center;color:#172554}
+.login-box p{text-align:center;color:#667085;margin:10px 0 25px}
+.login-box label{display:block;font-weight:bold;margin-top:15px}
+.login-box input{width:100%;padding:13px;margin-top:7px;border:1px solid #ccc;border-radius:8px}
+.login-btn,.blue-btn{
+    width:100%;padding:13px;margin-top:20px;border:0;border-radius:8px;
+    background:#2563eb;color:white;font-weight:bold;font-size:15px;
+}
+#error{color:red;text-align:center;margin-top:12px}
+
+#dashboard{display:none}
+
+.header{
+    background:#172554;color:white;padding:20px 5%;
+    display:flex;justify-content:space-between;align-items:center;
+}
+.logout{background:#dc2626;color:white;border:0;padding:10px 18px;border-radius:8px}
+
+.container{width:92%;max-width:1400px;margin:30px auto}
+
+.stats{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:25px
+}
+.stat{
+    background:white;padding:22px;border-radius:14px;
+    box-shadow:0 4px 15px #0001
+}
+.stat p{color:#667085}.stat h2{font-size:30px;margin-top:7px}
+
+.search{
+    background:white;padding:20px;border-radius:14px;margin-bottom:25px
+}
+.search input{
+    width:100%;padding:14px;border:1px solid #ccc;border-radius:8px
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+.card{
+    background:white;padding:22px;border-radius:16px;
+    border:1px solid #e5e7eb;box-shadow:0 4px 15px #0001;
+    transition:.3s;
+}
+.card:hover{transform:translateY(-4px);box-shadow:0 10px 25px #0002}
+.icon{
+    width:55px;height:55px;border-radius:50%;
+    background:#e8efff;display:flex;align-items:center;
+    justify-content:center;font-size:27px;margin-bottom:12px;
+}
+.card h3{color:#172554;margin-bottom:5px}
+.roll{color:#667085;font-size:14px;margin-bottom:14px}
+.card p{margin:8px 0;font-size:14px}
+.view{
+    width:100%;padding:11px;border:0;border-radius:8px;
+    background:#2563eb;color:white;font-weight:bold;margin-top:12px;
+}
+
+.pass{color:#047857;font-weight:bold}
+.fail{color:#dc2626;font-weight:bold}
+.done{color:#047857;font-weight:bold}
+.pending{color:#dc2626;font-weight:bold}
+
+.modal{
+    display:none;position:fixed;inset:0;background:#0009;
+    justify-content:center;align-items:center;padding:20px;z-index:10
+}
+.modal-box{
+    background:white;width:600px;max-width:100%;
+    max-height:90vh;overflow:auto;border-radius:18px;padding:30px;
+    position:relative;
+}
+.close{
+    position:absolute;right:15px;top:10px;
+    background:none;border:0;font-size:30px
+}
+.profile{text-align:center;margin-bottom:20px}
+.profile-icon{
+    width:70px;height:70px;background:#e8efff;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:35px;margin:auto
+}
+.details{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px
+}
+.detail{
+    background:#f8fafc;padding:14px;border-radius:9px
+}
+.detail span{display:block;color:#667085;font-size:13px;margin-bottom:5px}
+
+.assignment{
+    margin-top:25px;border-top:1px solid #ddd;padding-top:20px
+}
+.assignment h3{color:#172554;margin-bottom:15px}
+.assignment-box{
+    background:#f8fafc;padding:15px;border-radius:10px;margin-bottom:12px
+}
+.assignment-box input{margin-top:10px}
+.submit{
+    margin-top:10px;background:#16a34a;color:white;
+    border:0;padding:10px 15px;border-radius:7px
+}
+
+@media(max-width:1100px){
+    .grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:800px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:550px){
+    .grid,.stats,.details{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= LOGIN ================= -->
+
+<div class="login" id="loginPage">
+<div class="login-box">
+
+<h1>Teacher Login</h1>
+<p>Student Academic Tracking System</p>
+
+<label>Email</label>
+<input id="email" type="email" placeholder="teacher@college.com">
+
+<label>Password</label>
+<input id="password" type="password" placeholder="teacher123">
+
+<button class="login-btn" onclick="login()">Login</button>
+
+<div id="error"></div>
+
+</div>
+</div>
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<div id="dashboard">
+
+<div class="header">
+<div>
+<h2>Student Academic Tracking System</h2>
+<p>B.Sc Computer Science - Teacher Dashboard</p>
+</div>
+
+<button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+
+<div class="stats">
+
+<div class="stat">
+<p>Total Students</p>
+<h2>42</h2>
+</div>
+
+<div class="stat">
+<p>Internship Completed</p>
+<h2 id="internCount">0</h2>
+</div>
+
+<div class="stat">
+<p>Passed</p>
+<h2 id="passCount">0</h2>
+</div>
+
+<div class="stat">
+<p>Failed</p>
+<h2 id="failCount">0</h2>
+</div>
+
+</div>
+
+
+<div class="search">
+<input
+id="search"
+placeholder="Search by Student Name or Roll Number..."
+onkeyup="searchStudents()">
+</div>
+
+
+<div class="grid" id="studentGrid"></div>
+
+</div>
+</div>
+
+
+<!-- ================= STUDENT DETAILS ================= -->
+
+<div class="modal" id="studentModal">
+
+<div class="modal-box">
+
+<button class="close" onclick="closeModal()">×</button>
+
+<div class="profile">
+<div class="profile-icon">👨‍🎓</div>
+<h2 id="name"></h2>
+<p id="roll"></p>
+</div>
+
+<div class="details">
+
+<div class="detail">
+<span>Email</span>
+<strong id="emailDetail"></strong>
+</div>
+
+<div class="detail">
+<span>Internal 1</span>
+<strong id="i1"></strong>
+</div>
+
+<div class="detail">
+<span>Internal 2</span>
+<strong id="i2"></strong>
+</div>
+
+<div class="detail">
+<span>Internal 3</span>
+<strong id="i3"></strong>
+</div>
+
+<div class="detail">
+<span>Internal Average</span>
+<strong id="average"></strong>
+</div>
+
+<div class="detail">
+<span>Attendance</span>
+<strong id="attendance"></strong>
+</div>
+
+<div class="detail">
+<span>Internship</span>
+<strong id="internship"></strong>
+</div>
+
+<div class="detail">
+<span>Result</span>
+<strong id="result"></strong>
+</div>
+
+</div>
+
+
+<!-- ASSIGNMENT -->
+
+<div class="assignment">
+
+<h3>📚 Assignment Submission</h3>
+
+<div class="assignment-box">
+
+<strong>Assignment 1 - Python File Handling</strong>
+
+<p>Due Date: 15-10-2026</p>
+
+<input type="file" id="assignmentFile">
+
+<button class="submit" onclick="submitAssignment()">
+Submit Assignment
+</button>
+
+<p id="assignmentStatus" class="pending">
+Not Submitted
+</p>
+
+</div>
+
+
+<div class="assignment-box">
+
+<strong>Assignment 2 - Web Development</strong>
+
+<p>Due Date: 25-10-2026</p>
+
+<input type="file" id="assignmentFile2">
+
+<button class="submit" onclick="submitAssignment2()">
+Submit Assignment
+</button>
+
+<p id="assignmentStatus2" class="pending">
+Not Submitted
+</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<script>
+
+/* ===============================
+   STUDENT DATA - 42 STUDENTS
+================================ */
+
+const students=[];
+
+for(let i=1;i<=42;i++){
+
+    let roll="23CS"+String(i).padStart(3,"0");
+
+    let i1=40+(i*7)%55;
+    let i2=40+(i*9)%55;
+    let i3=40+(i*5)%55;
+
+    let attendance=70+(i*3)%30;
+
+    students.push({
+        roll:roll,
+        name:"Student "+String(i).padStart(2,"0"),
+        email:"student"+String(i).padStart(2,"0")+"@gmail.com",
+        i1:i1,
+        i2:i2,
+        i3:i3,
+        attendance:attendance,
+        internship:i%4!==0,
+        assignment1:false,
+        assignment2:false
+    });
+}
+
+
+/* ===============================
+   LOGIN
+================================ */
+
+function login(){
+
+    let email=document.getElementById("email").value.trim();
+    let password=document.getElementById("password").value.trim();
+
+    if(email==="teacher@college.com" && password==="teacher123"){
+
+        document.getElementById("loginPage").style.display="none";
+        document.getElementById("dashboard").style.display="block";
+
+        loadStudents();
+
+    }else{
+
+        document.getElementById("error").innerText=
+        "Invalid Email or Password";
+
+    }
+}
+
+
+/* ===============================
+   LOGOUT
+================================ */
+
+function logout(){
+
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("loginPage").style.display="flex";
+
+}
+
+
+/* ===============================
+   LOAD STUDENTS
+================================ */
+
+function loadStudents(){
+
+    const grid=document.getElementById("studentGrid");
+
+    grid.innerHTML="";
+
+    let internship=0;
+    let pass=0;
+    let fail=0;
+
+    students.forEach((s,index)=>{
+
+        let avg=(s.i1+s.i2+s.i3)/3;
+
+        let passed=avg>=40 && s.attendance>=75;
+
+        if(s.internship) internship++;
+        if(passed) pass++;
+        else fail++;
+
+        let card=document.createElement("div");
+
+        card.className="card";
+
+        card.innerHTML=`
+
+        <div class="icon">👨‍🎓</div>
+
+        <h3>${s.name}</h3>
+
+        <div class="roll">${s.roll}</div>
+
+        <p>📊 Attendance: <b>${s.attendance}%</b></p>
+
+        <p>📝 Internal Average:
+        <b>${avg.toFixed(1)}</b></p>
+
+        <p>🏢 Internship:
+        <span class="${s.internship?'done':'pending'}">
+        ${s.internship?'Completed':'Not Completed'}
+        </span>
+        </p>
+
+        <p>Result:
+        <span class="${passed?'pass':'fail'}">
+        ${passed?'PASS':'FAIL'}
+        </span>
+        </p>
+
+        <button class="view" onclick="viewStudent(${index})">
+        View Full Details →
+        </button>
+
+        `;
+
+        grid.appendChild(card);
+
+    });
+
+    document.getElementById("internCount").innerText=internship;
+    document.getElementById("passCount").innerText=pass;
+    document.getElementById("failCount").innerText=fail;
+}
+
+
+/* ===============================
+   VIEW STUDENT
+================================ */
+
+let currentStudent=0;
+
+function viewStudent(index){
+
+    currentStudent=index;
+
+    let s=students[index];
+
+    let avg=(s.i1+s.i2+s.i3)/3;
+
+    let passed=avg>=40 && s.attendance>=75;
+
+    document.getElementById("name").innerText=s.name;
+    document.getElementById("roll").innerText=s.roll;
+    document.getElementById("emailDetail").innerText=s.email;
+    document.getElementById("i1").innerText=s.i1;
+    document.getElementById("i2").innerText=s.i2;
+    document.getElementById("i3").innerText=s.i3;
+    document.getElementById("average").innerText=avg.toFixed(2);
+    document.getElementById("attendance").innerText=s.attendance+"%";
+
+    document.getElementById("internship").innerText=
+    s.internship?"Completed":"Not Completed";
+
+    document.getElementById("result").innerText=
+    passed?"PASS":"FAIL";
+
+    updateAssignmentStatus();
+
+    document.getElementById("studentModal").style.display="flex";
+}
+
+
+/* ===============================
+   ASSIGNMENT 1
+================================ */
+
+function submitAssignment(){
+
+    let file=document.getElementById("assignmentFile").files[0];
+
+    if(!file){
+
+        alert("Please choose an assignment file first.");
+        return;
+
+    }
+
+    students[currentStudent].assignment1=true;
+
+    updateAssignmentStatus();
+
+    alert("Assignment 1 submitted successfully!");
+}
+
+
+/* ===============================
+   ASSIGNMENT 2
+================================ */
+
+function submitAssignment2(){
+
+    let file=document.getElementById("assignmentFile2").files[0];
+
+    if(!file){
+
+        alert("Please choose an assignment file first.");
+        return;
+
+    }
+
+    students[currentStudent].assignment2=true;
+
+    updateAssignmentStatus();
+
+    alert("Assignment 2 submitted successfully!");
+}
+
+
+/* ===============================
+   ASSIGNMENT STATUS
+================================ */
+
+function updateAssignmentStatus(){
+
+    let s=students[currentStudent];
+
+    let status1=document.getElementById("assignmentStatus");
+    let status2=document.getElementById("assignmentStatus2");
+
+    if(s.assignment1){
+
+        status1.innerText="✅ Submitted";
+        status1.className="done";
+
+    }else{
+
+        status1.innerText="Not Submitted";
+        status1.className="pending";
+
+    }
+
+    if(s.assignment2){
+
+        status2.innerText="✅ Submitted";
+        status2.className="done";
+
+    }else{
+
+        status2.innerText="Not Submitted";
+        status2.className="pending";
+
+    }
+}
+
+
+/* ===============================
+   SEARCH
+================================ */
+
+function searchStudents(){
+
+    let value=document.getElementById("search")
+    .value.toLowerCase();
+
+    document.querySelectorAll(".card").forEach(card=>{
+
+        card.style.display=
+        card.innerText.toLowerCase().includes(value)
+        ?"block":"none";
+
+    });
+}
+
+
+/* ===============================
+   CLOSE POPUP
+================================ */
+
+function closeModal(){
+
+    document.getElementById("studentModal").style.display="none";
+
+}
+
+</script>
+
+</body>
+</html>
